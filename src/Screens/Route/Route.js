@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 // import Components
-import { Home, Login, Signin, Splash } from '../../index'
+import { Home, Login, Signup, Splash } from '../../index'
 const Stack = createNativeStackNavigator()
 
 // body of Route
@@ -18,7 +18,7 @@ export const Route = (props) => {
         <Stack.Screen name='splash' component={Splash} />
         <Stack.Screen name='home' component={Home} />
         <Stack.Screen name='login' component={Login} />
-        <Stack.Screen name='signin' component={Signin} />
+        <Stack.Screen name='signup' component={Signup} />
       </Stack.Navigator>
     </NavigationContainer>
   )

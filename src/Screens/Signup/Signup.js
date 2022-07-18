@@ -15,7 +15,7 @@ let formikSchema = yup.object().shape({
 })
 
 // body of Signin
-export const Signin = (props) => {
+export const Signup = (props) => {
 
   // return JSX
   return (
@@ -86,7 +86,6 @@ export const Signin = (props) => {
             <Pressable
               style={styles.signup}
               onPress={handleSubmit}
-              disabled={!isValid}
             >
               <Text style={styles.signupText}>Signup</Text>
             </Pressable>

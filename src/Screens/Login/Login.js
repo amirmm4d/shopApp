@@ -1,9 +1,10 @@
 // Import module
 import React, { useState, useEffect } from 'react'
-import { View, Text, Pressable, TextInput, Button, StyleSheet } from 'react-native'
+import { View, Text, Pressable, TextInput, Image, StyleSheet } from 'react-native'
 import { Formik } from 'formik'
 import * as yup from 'yup'
 import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // api
 const url = 'http://194.62.43.26:1337/api'
@@ -19,25 +20,52 @@ let formikSchema = yup.object().shape({
 })
 
 // body of Login
-export const Login = (props) => {
+export const Login = ({ navigation }) => {
 
-  const [userdetails, setUserDetails] = useState({})
+  // const [image, setImage] = useState('')
 
-  const handleLogin = async (values) => {
-    const data = {
-      'username': values.username,
-      'password': values.password
-    }
-    try {
-      const res = await axios.post(url + singin, data)
-      const { token } = res.data
-      console.log(token);
-    }
-    catch (err) {
-      console.log(`error: ${err.code}`);
-    }
-  }
+  // const handleLogin = async (values) => {
+  //   const data = {
+  //     'username': values.username,
+  //     'password': values.password
+  //   }
+  //   try {
+  //     const res = await axios.post(url + singin, data)
+  //     const { token } = res.data
+  //     console.log(token);
+  //   }
+  //   catch (err) {
+  //     console.log(`error: ${err.code}`);
+  //   }
+  // }
 
+
+  // const storeData = async (value) => {
+  //   try {
+  //     const photoResp = await axios.get('http://jsonplaceholder.typicode.com/photos')
+  //     // console.log(photoResp);
+  //     const photoData = await JSON.stringify(photoResp.data)
+  //     console.log(typeof(photoData));
+  //     await AsyncStorage.setItem('GalleryPhotos', photoData);
+  //   } catch (e) {
+  //     // saving error
+  //     console.log(e);
+  //   }
+  // }
+
+
+  // const storeShow = async (key) => {
+  //   try {
+  //     const res = await AsyncStorage.getItem(key)
+  //     console.log('done');
+  //     const resData = await JSON.parse(res)
+  //     const id = resData.find(item => item.id == 2)
+  //     console.log(id.thumbnailUrl);
+  //     setImage(id.thumbnailUrl)
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
   // return JSX
   return (
@@ -48,7 +76,7 @@ export const Login = (props) => {
       <Formik
         validationSchema={formikSchema}
         initialValues={{ username: '', password: '' }}
-        onSubmit={(values) => handleLogin(values)}
+        onSubmit={() => navigation.navigate('home')}
       >
         {({ values, errors, touched, isValid, handleChange, handleSubmit }) => (
           <View style={styles.form}>
@@ -56,7 +84,6 @@ export const Login = (props) => {
               style={[styles.username, styles.inputs]}
               placeholder='Username'
               placeholderTextColor={'#598392'}
-              contextMenuHidden={true}
               selectionColor={'#598392'}
               onChangeText={handleChange('username')}
               value={values.username}
@@ -69,7 +96,6 @@ export const Login = (props) => {
               style={[styles.password, styles.inputs]}
               placeholder='Password'
               placeholderTextColor={'#598392'}
-              contextMenuHidden={true}
               secureTextEntry={true}
               selectionColor={'#598392'}
               onChangeText={handleChange('password')}
@@ -79,20 +105,25 @@ export const Login = (props) => {
               (errors.password && touched.password) &&
               <Text style={styles.error}>{errors.password}</Text>
             }
-            <Pressable style={styles.forgotPass}
-              onPress={() => {
-                console.log('forgot pass')
-              }}
-            >
+            <Pressable style={styles.forgotPass}>
               <Text style={styles.forgotText}>forgot password ?</Text>
             </Pressable>
-            <Pressable
-              style={styles.login}
-              onPress={handleSubmit}
-              disabled={!isValid}
-            >
-              <Text style={styles.loginText}>Login</Text>
-            </Pressable>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                style={styles.login}
+                onPress={handleSubmit}
+                disabled={!isValid}
+              >
+                <Text style={styles.loginText}>Login</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.singup}
+                onPress={() => navigation.navigate('signup')}
+              >
+                <Text style={styles.loginText}>Signup</Text>
+              </Pressable>
+            </View>
           </View>)}
       </Formik>
     </View>
@@ -139,15 +170,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 15
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    margin: 18
+  },
   login: {
     width: 120,
     height: 45,
     backgroundColor: '#edf2f4',
-    borderTopRightRadius: 20,
     borderBottomLeftRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 22
+  },
+  singup:{
+    width: 120,
+    height: 45,
+    backgroundColor: '#edf2f4',
+    borderTopRightRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loginText: {
     fontFamily: 'Vazirmatn-Light',
