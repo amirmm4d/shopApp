@@ -1,63 +1,25 @@
 // Import module
-import React, { useState, useEffect } from 'react'
-import { View, Text, Pressable, Image, FlatList, StyleSheet } from 'react-native'
-import { log } from 'react-native-reanimated';
-import axios from 'axios';
+import React, { } from 'react'
+import { View, Text, Pressable, FlatList, Image, StyleSheet } from 'react-native'
 
 // import Components
-import Icon from 'react-native-vector-icons/Ionicons';
 
-// body of Home
-export const Home = (props) => {
-  const [itemCart, setItemCart] = useState([])
-  const [items, setItems] = useState([])
 
-  useEffect(() => {
-    getItemHandler()
-  }, []);
+// body of Cart
+export const Cart = (props) => {
 
-  const getItemHandler = async () => {
-    const { data } = await axios.get('http://jsonplaceholder.typicode.com/photos')
-    const res = data.slice(0, 50)
-    setItems(res)
-  }
-
-  const addToCartHandler = (id) => {
-    const [...res] = items
-    const resulat = res.find(item => item.id == id)
-    setItemCart(old => [...old, resulat])
-  }
+  console.log(props.route.params);
 
   // return JSX
   return (
-    <View style={styles.homeContainer}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => console.log(items)}
-        >
-          <Icon style={styles.menu} name="menu" size={30} color="black" />
-        </Pressable>
-        <Text style={styles.logoName} >SHOP</Text>
-        <Pressable
-          onPress={() => props.navigation.navigate({ 
-            name: 'cart',
-            params: itemCart
-            })}
-        >
-          <View style={styles.cartContainer}>
-            <Icon style={styles.cart} name="cart-outline" size={30} color="black" />
-            <View style={itemCart == 0 ? styles.numberContainerDisable : styles.numberContainer}>
-              <Text style={styles.number}>{itemCart.length}</Text>
-            </View>
-          </View>
-        </Pressable>
-      </View>
+    <View style={styles.cartContainer}>
       <View style={styles.categories}>
         <FlatList
           style={{
             width: '100%',
+            height: '90%'
           }}
-          data={items}
+          data={props.route.params}
           showsVerticalScrollIndicator={false}
           keyExtractor={(items, index) => items.id * index}
           renderItem={({ item }) => {
@@ -120,65 +82,23 @@ export const Home = (props) => {
           }}
         />
       </View>
+      <Pressable
+        style={styles.submmitCon}
+        onPress={() => addToCartHandler(item.id)}
+      >
+        <Text style={styles.submmit}>تکمیل خرید</Text>
+      </Pressable>
     </View>
   )
 }
 
 // Styles
 const styles = StyleSheet.create({
-  homeContainer: {
-    flex: 1,
-    backgroundColor: '#f4a261',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    flex: 0.5,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  menu: {
-    color: 'black',
-    margin: 10,
-    fontSize: 34
-  },
-  logoName: {
-    fontFamily: 'Vazirmatn-Medium',
-    fontSize: 22,
-    margin: 10
-  },
-  cart: {
-    margin: 10
-  },
-  numberContainer: {
-    width: 20,
-    height: 20,
-    backgroundColor: 'red',
-    borderRadius: 50,
-    position: 'absolute',
-    top: '5%',
-    left: '33%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  numberContainerDisable: {
-    display: 'none'
-  },
-  number: {
-    fontSize: 12,
-    fontFamily: 'Vazirmatn-Light',
-    color: 'white'
-  },
   cartContainer: {
-    flexDirection: 'row'
-  },
-  categories: {
-    flex: 5.5,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#bde0fe',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
   },
   items: {
     backgroundColor: 'white',
@@ -189,5 +109,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  submmitCon: {
+    marginBottom: 20,
+    width: 100,
+    height: 35,
+    backgroundColor: 'orange',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    alignSelf: 'center',
+  },
+  submmit: {
+    color: 'white',
+    fontFamily: 'Vazirmatn-Medium'
   }
 })

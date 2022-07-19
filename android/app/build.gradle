@@ -230,6 +230,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('release.keystore')
+            storePassword '123456789'
+            keyAlias 'key_alias'
+            keyPassword '123456789'
+    }
     }
     buildTypes {
         debug {
@@ -241,6 +247,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
 
@@ -266,8 +273,6 @@ dependencies {
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
-    implementation project(':react-native-keychain')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 

@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, Pressable, TextInput, Image, StyleSheet } from 'react-native'
 import { Formik } from 'formik'
 import * as yup from 'yup'
-import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import axios from 'axios'
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // api
 const url = 'http://194.62.43.26:1337/api'
