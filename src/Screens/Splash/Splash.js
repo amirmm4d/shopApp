@@ -1,18 +1,28 @@
 // Import module
 import React, { useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import Components
-
 
 // body of Splash
 export const Splash = ({ navigation }) => {
 
   useEffect(() => {
-    setTimeout(() => {
-      navigation.navigate('signup')
-    }, 2000)
+    autoLoginHandler()
   }, []);
+
+  // auto login
+  const autoLoginHandler = async () => {
+    const Token = await AsyncStorage.getItem('Token')
+    if (Token == null || Token == '' || Token == undefined ) {
+      console.log(`empty ${Token}`);
+      navigation.navigate('signin')
+    }else {
+      navigation.navigate('home')
+      console.log(`Token ${Token}`);
+    }
+  }
 
   // return JSX
   return (

@@ -1,25 +1,64 @@
 // Import module
 import React, { useState, useEffect } from 'react'
-import { View, Text, Pressable, Image, FlatList, StyleSheet } from 'react-native'
-import { log } from 'react-native-reanimated';
+import { View, Text, Pressable, Image, FlatList, TextInput, StyleSheet } from 'react-native'
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import Components
 import Icon from 'react-native-vector-icons/Ionicons';
 
+// api urls
+const url = 'http://194.62.43.26:1337/api'
+const seatchUrl = '/products/search'
+
 // body of Home
 export const Home = (props) => {
+  // state
   const [itemCart, setItemCart] = useState([])
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState()
+  const [search, setSearch] = useState('')
+  const [next, setNext] = useState('')
+  const [prev, setPrev] = useState('')
 
+  // useEffect
   useEffect(() => {
     getItemHandler()
   }, []);
 
+  // useEffect(() => {
+
+  // },[search])
+
+  // get Item from API
   const getItemHandler = async () => {
-    const { data } = await axios.get('http://jsonplaceholder.typicode.com/photos')
-    const res = data.slice(0, 50)
-    setItems(res)
+    const Token = await AsyncStorage.getItem('Token')
+    const headers = { 'Authorization': `Token ${Token}` }
+    const { data } = await axios.get(url + '/products', { headers: headers })
+    setItems(data.results)
+    setNext(data.next)
+  }
+
+  const loadItemsHandler = async () => {
+    const Token = await AsyncStorage.getItem('Token')
+    const headers = { 'Authorization': `Token ${Token}` }
+    const { data } = await axios.get(next, { headers: headers })
+    setItems(old => [...old, ...data.results])
+    setNext(data.next)
+    setPrev(data.previous)
+  }
+
+  const searchHandler = async (value) => {
+    setSearch(value)
+    const Token = await AsyncStorage.getItem('Token')
+    const headers = { Authorization: `Token ${Token}` }
+    const params = { name: search }
+    const { data } = await axios.get(url + seatchUrl, { params: params, headers: headers })
+    setItems(data)
+  }
+
+  const test = (value) => {
+    setSearch(value)
+    console.log(search);
   }
 
   const addToCartHandler = (id) => {
@@ -32,17 +71,33 @@ export const Home = (props) => {
   return (
     <View style={styles.homeContainer}>
       <View style={styles.header}>
-        <Pressable
-          onPress={() => console.log(items)}
+        {/* <Pressable
+          onPress={() => searchHandler()}
         >
-          <Icon style={styles.menu} name="menu" size={30} color="black" />
-        </Pressable>
-        <Text style={styles.logoName} >SHOP</Text>
+          <Icon style={styles.menu} name="search" size={30} color="black" />
+        </Pressable> */}
+        <TextInput style={{
+          width: '70%',
+          height: '60%',
+          backgroundColor: 'white',
+          marginLeft: '10%',
+          borderRadius: 12,
+          color: 'orange',
+          fontFamily: 'Vazirmatn',
+          fontSize: 16,
+          textAlign: 'center',
+        }}
+          value={search}
+          // onChange={() => test()}
+          onChangeText={v => searchHandler(v)}
+        />
         <Pressable
-          onPress={() => props.navigation.navigate({ 
-            name: 'cart',
-            params: itemCart
-            })}
+          onPress={() => //props.navigation.navigate({
+            //   name: 'cart',
+            //   params: itemCart
+            // })
+            loadItemsHandler()
+          }
         >
           <View style={styles.cartContainer}>
             <Icon style={styles.cart} name="cart-outline" size={30} color="black" />
@@ -58,15 +113,28 @@ export const Home = (props) => {
             width: '100%',
           }}
           data={items}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(items, index) => items.id * index}
+          // showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) => index}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => loadItemsHandler()}
           renderItem={({ item }) => {
             return (
               <View style={styles.items}>
-                <Image
-                  style={{ width: 140, height: 140, borderTopLeftRadius: 15, borderBottomLeftRadius: 15 }}
-                  source={{ uri: item.thumbnailUrl }}
-                />
+                <View
+                  style={{
+                    backgroundColor: 'gray',
+                    width: 150,
+                    height: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Icon name='happy-outline' size={130}
+                    style={{
+                      transform: [{ rotate: '20deg' }],
+                    }}
+                  />
+                </View>
                 <View style={{
                   flex: 1,
                   height: '100%',
@@ -80,38 +148,20 @@ export const Home = (props) => {
                       fontFamily: 'Vazirmatn-Medium',
                       width: 180
                     }}
-                  >{item.title}</Text>
+                  >{item.name}</Text>
                   <View
                     style={{
                       width: '100%',
                       flexDirection: 'row',
                       justifyContent: 'space-around',
+                      alignItems: 'center',
                     }}
                   >
                     <Text>Price: 15000$</Text>
                     <Pressable
                       onPress={() => addToCartHandler(item.id)}
                     >
-                      <View
-                        style={{
-                          color: 'white',
-                          width: 25,
-                          height: 25,
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderRadius: 20,
-                          backgroundColor: 'orange'
-                        }}
-                      >
-
-                        <Text
-                          style={{
-                            color: 'white',
-                            fontSize: 18,
-                          }}
-                        >+</Text>
-                      </View>
+                      <Icon name='add-circle' color='orange' size={35} />
                     </Pressable>
                   </View>
                 </View>

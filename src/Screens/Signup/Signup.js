@@ -3,19 +3,50 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, Pressable, TextInput, Image, StyleSheet } from 'react-native'
 import { Formik } from 'formik'
 import * as yup from 'yup'
+import axios from 'axios'
 
 // import Components
 
+// api url
+const url = 'http://194.62.43.26:1337/api'
+const signup = '/users/signup'
+
 // validation Schema
 let formikSchema = yup.object().shape({
-  username: yup.string(),
-  username: yup.string(),
+  firstname: yup.string().required('firtname is required'),
+  lastname: yup.string().required('lastname is required'),
   username: yup.string().required('username is required'),
-  password: yup.string().required('password is required').min(6).max(10)
+  password: yup.string().required('password is required').min(4).max(14)
 })
 
 // body of Signin
 export const Signup = (props) => {
+  // state
+  const [isUsername, setIsusername] = useState(false)
+
+  // methods
+  const signupHandler = async (values) => {
+    try {
+      const res = await axios.post(url + signup,
+        {
+          'firs_tname': values.firstname,
+          'last_name': values.lastname,
+          'username': values.username,
+          'password': values.password
+        })
+      if (res.status == 201) {
+        setIsusername(false)
+        props.navigation.navigate({
+          name: 'signin',
+          params: 'newUser'
+        })
+      }
+    } catch (e) {
+      if (e.response.data.username) {
+        setIsusername(true)
+      }
+    }
+  }
 
   // return JSX
   return (
@@ -25,31 +56,38 @@ export const Signup = (props) => {
       </View>
       <Formik
         validationSchema={formikSchema}
-        initialValues={{ name: '', email: '', username: '', password: '' }}
-        onSubmit={() => props.navigation.navigate('home')}
+        initialValues={{ firstname: '', lastname: '', username: '', password: '' }}
+        onSubmit={values => signupHandler(values)}
       >
-        {({ values, errors, touched, isValid, handleChange, handleSubmit }) => (
-
+        {({ values, errors, touched, handleChange, handleSubmit }) => (
           <View style={styles.form}>
             <TextInput
               style={[styles.username, styles.inputs]}
-              placeholder='Name'
+              placeholder='First Name'
               placeholderTextColor={'#8338ec'}
               selectionColor={'#8338ec'}
-              onChangeText={handleChange('name')}
+              onChangeText={handleChange('firstname')}
               value={values.name}
             />
+            {
+              (errors.firstname && touched.firstname) &&
+              <Text style={styles.error}>{errors.firstname}</Text>
+            }
             <TextInput
               style={[styles.password, styles.inputs]}
-              placeholder='Email'
+              placeholder='Last Name'
               placeholderTextColor={'#8338ec'}
               selectionColor={'#8338ec'}
-              onChangeText={handleChange('email')}
+              onChangeText={handleChange('lastname')}
               value={values.email}
             />
+            {
+              (errors.lastname && touched.lastname) &&
+              <Text style={styles.error}>{errors.lastname}</Text>
+            }
             <TextInput
-              style={[styles.password, styles.inputs]}
-              placeholder='username'
+              style={[styles.username, styles.inputs]}
+              placeholder='Username'
               placeholderTextColor={'#8338ec'}
               selectionColor={'#8338ec'}
               onChangeText={handleChange('username')}
@@ -58,6 +96,10 @@ export const Signup = (props) => {
             {
               (errors.username && touched.username) &&
               <Text style={styles.error}>{errors.username}</Text>
+            }
+            {
+              (isUsername) &&
+              <Text style={styles.error}>username Exists</Text>
             }
             <TextInput
               style={[styles.password, styles.inputs]}
@@ -70,7 +112,7 @@ export const Signup = (props) => {
               value={values.password}
             />
             {
-              (errors.username && touched.username) &&
+              (errors.password && touched.password) &&
               <Text style={styles.error}>{errors.password}</Text>
             }
             <View style={styles.loginContainer}>
@@ -82,7 +124,6 @@ export const Signup = (props) => {
                 <Text style={[styles.loginText, styles.loginT]}>Login</Text>
               </Pressable>
             </View>
-
             <Pressable
               style={styles.signup}
               onPress={handleSubmit}
@@ -126,6 +167,7 @@ const styles = StyleSheet.create({
     color: '#8338ec',
     fontSize: 16,
     textAlign: 'center',
+    fontFamily: 'Vazirmatn-Medium'
   },
   forgotText: {
     margin: 12,

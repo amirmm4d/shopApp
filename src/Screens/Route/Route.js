@@ -17,7 +17,7 @@ export const Route = (props) => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name='splash' component={Splash} />
         <Stack.Screen name='signup' component={Signup} />
-        <Stack.Screen name='login' component={Login} />
+        <Stack.Screen name='signin' component={Login} />
         <Stack.Screen name='home' component={Home} />
         <Stack.Screen name='cart' component={Cart} />
       </Stack.Navigator>

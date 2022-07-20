@@ -3,12 +3,11 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, Pressable, TextInput, Image, StyleSheet } from 'react-native'
 import { Formik } from 'formik'
 import * as yup from 'yup'
-// import axios from 'axios'
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// api
+// api url
 const url = 'http://194.62.43.26:1337/api'
-const singup = '/users/signup'
 const singin = '/users/signin'
 
 // import Components
@@ -20,52 +19,41 @@ let formikSchema = yup.object().shape({
 })
 
 // body of Login
-export const Login = ({ navigation }) => {
+export const Login = (props) => {
+  // state
+  const [newUser, setNewUser] = useState(false)
 
-  // const [image, setImage] = useState('')
+  // useEffect
+  useEffect(() => {
+    if (props.route.params == 'newUser') {
+      setNewUser(true)
+    }
+  }, []);
 
-  // const handleLogin = async (values) => {
-  //   const data = {
-  //     'username': values.username,
-  //     'password': values.password
-  //   }
-  //   try {
-  //     const res = await axios.post(url + singin, data)
-  //     const { token } = res.data
-  //     console.log(token);
-  //   }
-  //   catch (err) {
-  //     console.log(`error: ${err.code}`);
-  //   }
-  // }
-
-
-  // const storeData = async (value) => {
-  //   try {
-  //     const photoResp = await axios.get('http://jsonplaceholder.typicode.com/photos')
-  //     // console.log(photoResp);
-  //     const photoData = await JSON.stringify(photoResp.data)
-  //     console.log(typeof(photoData));
-  //     await AsyncStorage.setItem('GalleryPhotos', photoData);
-  //   } catch (e) {
-  //     // saving error
-  //     console.log(e);
-  //   }
-  // }
-
-
-  // const storeShow = async (key) => {
-  //   try {
-  //     const res = await AsyncStorage.getItem(key)
-  //     console.log('done');
-  //     const resData = await JSON.parse(res)
-  //     const id = resData.find(item => item.id == 2)
-  //     console.log(id.thumbnailUrl);
-  //     setImage(id.thumbnailUrl)
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
+  // login
+  const handleLogin = async (values) => {
+    try {
+      const res = await axios.post(url + singin, { 'username': values.username, 'password': values.password })
+      const { token } = res.data
+      storeTokenHandler(token)
+      if (token) {
+        props.navigation.navigate('home')
+      }
+    }
+    catch (e) {
+      console.log(e.response);
+    }
+  }
+  // Save Token
+  const storeTokenHandler = async (Token) => {
+    try {
+      // save Token
+      await AsyncStorage.setItem('Token', Token);
+    } catch (e) {
+      // saving error
+      console.log(e);
+    }
+  }
 
   // return JSX
   return (
@@ -73,10 +61,14 @@ export const Login = ({ navigation }) => {
       <View>
         <Text style={styles.header}>Login</Text>
       </View>
+      {
+        (newUser) &&
+        <Text style={styles.newUser}>new user please wait for accept</Text>
+      }
       <Formik
         validationSchema={formikSchema}
         initialValues={{ username: '', password: '' }}
-        onSubmit={() => navigation.navigate('home')}
+        onSubmit={values => handleLogin(values)}
       >
         {({ values, errors, touched, isValid, handleChange, handleSubmit }) => (
           <View style={styles.form}>
@@ -119,7 +111,7 @@ export const Login = ({ navigation }) => {
 
               <Pressable
                 style={styles.singup}
-                onPress={() => navigation.navigate('signup')}
+                onPress={() => props.navigation.navigate('signup')}
               >
                 <Text style={styles.loginText}>Signup</Text>
               </Pressable>
@@ -182,7 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  singup:{
+  singup: {
     width: 120,
     height: 45,
     backgroundColor: '#edf2f4',
@@ -198,5 +190,10 @@ const styles = StyleSheet.create({
   error: {
     fontFamily: 'Vazirmatn-Light',
     color: '#ffb703',
+  },
+  newUser: {
+    color: 'white',
+    fontSize: 20,
+    fontFamily: 'Vazirmatn-Bold'
   }
 })
